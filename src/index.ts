@@ -1,7 +1,7 @@
 import express from 'express'
 // @ts-ignore
 import config from '../config.json'
-import {verifyAndDecodeToken} from "./utils";
+import {loaders, verifyAndDecodeToken} from "./utils";
 import mongoose from 'mongoose'
 import Request from "./models/Request";
 import * as yup from 'yup'
@@ -71,6 +71,13 @@ app.post('/request', async (req, res) => {
     await request.save()
 
     console.log(`Created request on channel ${channel_id} by ${user_id}: `, data)
+
+    io.to(channel_id).emit('addMap', {
+        title: data.title,
+        link: data.link,
+        requester: loaders.twitch.users.load(user_id),
+        id: request._id
+    })
 
     res.json({ok: true})
 })
