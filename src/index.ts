@@ -15,13 +15,18 @@ const app = express()
 
 const server = http.createServer(app)
 
-const io = require('socket.io')(server) as SocketIOServer
-
 app.use(cors())
+
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*',
+    }
+}) as SocketIOServer
 
 app.use(express.json())
 
 app.use((req, res, next) => {
+    if (req.path.startsWith('/socket.io')) return next()
     const reject = () => res.status(401).send('Unauthorized')
     if (!req.headers.authorization) return reject()
     const header = req.headers.authorization
@@ -50,7 +55,8 @@ app.post('/request', async (req, res) => {
 
     const validator = yup.object().shape({
         title: yup.string().required(),
-        link: yup.string().url().required()
+        link: yup.string().url().required(),
+        forumLevel: yup.number().min(1).max(20)
     })
 
     let data
@@ -67,6 +73,7 @@ app.post('/request', async (req, res) => {
     request.requester = user_id
     request.title = data.title
     request.link = data.link
+    request.lvl = data.forumLevel || undefined
 
     await request.save()
 

@@ -5,6 +5,7 @@ export interface IRequest extends Document {
     channel: string
     title: string
     link: string
+    lvl?: number
 }
 
 const schema = new mongoose.Schema({
@@ -23,6 +24,9 @@ const schema = new mongoose.Schema({
     link: {
         type: String,
         required: true
+    },
+    lvl: {
+        type: Number
     }
 })
 
