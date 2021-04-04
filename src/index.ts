@@ -72,12 +72,7 @@ app.post('/request', async (req, res) => {
 
     console.log(`Created request on channel ${channel_id} by ${user_id}: `, data)
 
-    io.to(channel_id).emit('addMap', {
-        title: data.title,
-        link: data.link,
-        requester: loaders.twitch.users.load(user_id),
-        id: request._id
-    })
+    io.to(channel_id).emit('reloadList')
 
     res.json({ok: true})
 })
