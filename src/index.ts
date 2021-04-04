@@ -83,7 +83,7 @@ app.get('/current', async (req, res) => {
     if (!channel) return
 
     if (!channel.activeMap) {
-        return null
+        return res.json(null)
     }
 
     const item = await Request.findOne({
