@@ -128,7 +128,7 @@ app.post('/request', async (req, res) => {
 
     io.to(channel_id).emit('reload')
 
-    res.json({ok: true})
+    res.end()
 })
 
 app.delete('/request/:id', moderatorOnly, async (req, res) => {
@@ -142,7 +142,7 @@ app.delete('/request/:id', moderatorOnly, async (req, res) => {
 
     io.to(channel_id).emit('reload')
 
-    res.json({ok: true})
+    res.end()
 })
 
 app.put('/request/:id', moderatorOnly,  async (req, res) => {
@@ -179,7 +179,7 @@ app.put('/request/:id', moderatorOnly,  async (req, res) => {
 
     io.to(channel_id).emit('reload')
 
-    res.json({ok: true})
+    res.end()
 })
 
 io.use(async (socket, next) => {

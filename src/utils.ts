@@ -20,7 +20,7 @@ export const loaders = {
 }
 
 export function moderatorOnly(req: Request, res: Response, next: NextFunction) {
-    if (req.user.role === 'broadcaster' || req.user.role === 'moderator') return next
+    if (req.user.role === 'broadcaster' || req.user.role === 'moderator') return next()
     res.status(401).json({
         error: 'You do not have permission to access this resource.'
     })
