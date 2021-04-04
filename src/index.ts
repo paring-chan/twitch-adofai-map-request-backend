@@ -130,6 +130,43 @@ app.post('/request', async (req, res) => {
     res.json({ok: true})
 })
 
+app.put('/request/:id', async (req, res) => {
+    const {channel_id, user_id} = req.user
+
+    const validator = yup.object().shape({
+        title: yup.string().required(),
+        link: yup.string().url().required(),
+        forumLevel: yup.number().min(1).max(20).notRequired()
+    })
+
+    let data
+
+    try {
+        if (!req.body.forumLevel) delete req.body.forumLevel
+        data = await validator.validate(req.body)
+    } catch (error) {
+        return res.status(400).json({error})
+    }
+
+    const request = await Request.findOne({
+        _id: req.params.id,
+        channel: channel_id
+    })
+
+    if (!request) return res.status(404).json({error: 'request not found'})
+    request.title = data.title
+    request.link = data.link
+    request.lvl = data.forumLevel || undefined
+
+    await request.save()
+
+    console.log(`Updated request on channel ${channel_id} by ${user_id}: `, data)
+
+    io.to(channel_id).emit('reload')
+
+    res.json({ok: true})
+})
+
 io.use(async (socket, next) => {
     const reject = () => socket.disconnect(true)
     if (!socket.handshake.query.auth) return reject()
