@@ -2,6 +2,7 @@ import express from 'express'
 // @ts-ignore
 import config from '../config.json'
 import {verifyAndDecodeToken} from "./utils";
+import mongoose from 'mongoose'
 
 const secret = Buffer.from(config.secretKey, 'base64')
 
@@ -30,7 +31,10 @@ app.get('/requests', (req, res) => {
     res.json([])
 })
 
-app.listen(config.port, () => console.log(`Listening on port ${config.port}`))
+mongoose.connect(config.databaseURL, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+}).then(() => app.listen(config.port, () => console.log(`Listening on port ${config.port}`)))
 
 // typings
 declare global {
