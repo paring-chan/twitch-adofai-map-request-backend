@@ -55,10 +55,15 @@ app.post('/request', async (req, res) => {
         return res.status(400).json({error})
     }
 
-    console.log(data)
+    const request = new Request()
 
-    console.log(channel_id)
-    console.log(user_id)
+    request.channel = channel_id
+    request.requester = user_id
+    request.title = data.title
+    request.link = data.link
+
+    await request.save()
+
     res.json({ok: true})
 })
 
