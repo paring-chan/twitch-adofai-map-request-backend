@@ -64,6 +64,8 @@ app.post('/request', async (req, res) => {
 
     await request.save()
 
+    console.log(`Created request on channel ${channel_id} by ${user_id}: `, data)
+
     res.json({ok: true})
 })
 
