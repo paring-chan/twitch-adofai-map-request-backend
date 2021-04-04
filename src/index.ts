@@ -75,8 +75,18 @@ app.post('/request', async (req, res) => {
     res.json({ok: true})
 })
 
+io.use(async (socket, next) => {
+    const reject = () => socket.disconnect(true)
+    if (!socket.handshake.query.auth) return reject()
+    const auth = socket.handshake.query.auth as string
+    const user = await verifyAndDecodeToken(auth, secret)
+    if (!user) return reject()
+    socket.user = user
+})
+
 io.on('connection', (socket) => {
     console.log(`Connected new socket: ${socket.id}`)
+    socket.join(socket.user.channel_id)
 })
 
 mongoose.connect(config.databaseURL, {
@@ -92,5 +102,11 @@ declare global {
         interface Request {
             user: any
         }
+    }
+}
+
+declare module 'socket.io' {
+    interface Socket {
+        user: any
     }
 }
