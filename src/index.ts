@@ -1,7 +1,7 @@
 import express from 'express'
 // @ts-ignore
 import config from '../config.json'
-import {loaders, verifyAndDecodeToken} from "./utils";
+import {loaders, moderatorOnly, verifyAndDecodeToken} from "./utils";
 import mongoose from 'mongoose'
 import Request from "./models/Request";
 import * as yup from 'yup'
@@ -130,7 +130,17 @@ app.post('/request', async (req, res) => {
     res.json({ok: true})
 })
 
-app.put('/request/:id', async (req, res) => {
+app.delete('/request/:id', moderatorOnly, async (req, res) => {
+    const {channel_id} = req.user
+    const request = await Request.findOne({
+        _id: req.params.id,
+        channel: channel_id
+    })
+    if (!request) return res.status(404).json({error: 'request not found'})
+    await request.delete()
+})
+
+app.put('/request/:id', moderatorOnly,  async (req, res) => {
     const {channel_id, user_id} = req.user
 
     const validator = yup.object().shape({
