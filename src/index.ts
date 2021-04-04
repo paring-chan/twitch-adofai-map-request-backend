@@ -4,6 +4,7 @@ import config from '../config.json'
 import {verifyAndDecodeToken} from "./utils";
 import mongoose from 'mongoose'
 import Request from "./models/Request";
+import * as yup from 'yup'
 
 const secret = Buffer.from(config.secretKey, 'base64')
 
@@ -33,6 +34,28 @@ app.get('/requests', async (req, res) => {
     res.json(await Request.find({
         channel: channel_id
     }))
+})
+
+app.post('/request', async (req, res) => {
+    const {channel_id, user_id} = req.user
+
+    const validator = yup.object().shape({
+        title: yup.string().required(),
+        link: yup.string().url().required()
+    })
+
+    let data
+
+    try {
+        data = await validator.validate(req.body)
+    } catch (error) {
+        return res.status(400).json({error})
+    }
+
+
+    console.log(channel_id)
+    console.log(user_id)
+    res.json({ok: true})
 })
 
 mongoose.connect(config.databaseURL, {
