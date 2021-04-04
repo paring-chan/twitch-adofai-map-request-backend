@@ -32,6 +32,7 @@ const io = require('socket.io')(server, {
 }) as SocketIOServer
 
 app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 
 app.use(async (req, res, next) => {
     if (req.path.startsWith('/socket.io')) return next()
