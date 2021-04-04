@@ -32,7 +32,6 @@ const io = require('socket.io')(server, {
 }) as SocketIOServer
 
 app.use(express.json())
-app.use(express.urlencoded({extended: true}))
 
 app.use(async (req, res, next) => {
     if (req.path.startsWith('/socket.io')) return next()
@@ -102,12 +101,13 @@ app.post('/request', async (req, res) => {
     const validator = yup.object().shape({
         title: yup.string().required(),
         link: yup.string().url().required(),
-        forumLevel: yup.number().min(1).max(20)
+        forumLevel: yup.number().min(1).max(20).notRequired()
     })
 
     let data
 
     try {
+        if (!req.body.forumLevel) delete req.body.forumLevel
         data = await validator.validate(req.body)
     } catch (error) {
         return res.status(400).json({error})
