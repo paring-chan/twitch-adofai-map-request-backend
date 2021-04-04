@@ -9,6 +9,7 @@ import cors from 'cors'
 import http from 'http'
 import {Server as SocketIOServer} from "socket.io";
 import axios from "axios";
+import Channel from "./models/Channel";
 
 process.on('uncaughtException', console.error)
 process.on('unhandledRejection', console.error)
@@ -32,7 +33,7 @@ const io = require('socket.io')(server, {
 
 app.use(express.json())
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     if (req.path.startsWith('/socket.io')) return next()
     const reject = () => res.status(401).send('Unauthorized')
     if (!req.headers.authorization) return reject()
@@ -45,6 +46,15 @@ app.use((req, res, next) => {
         req.user = user
     } else {
         return reject()
+    }
+    if (!req.user) return reject()
+    let channel = await Channel.findOne({
+        id: req.user.channel_id
+    })
+    if (!channel) {
+        channel = new Channel()
+        channel.id = req.user.channel_
+        await channel.save()
     }
     next()
 })
@@ -60,6 +70,29 @@ app.get('/requests', async (req, res) => {
         item.requester = requester.display_name || requester.name
     }
     res.json(list)
+})
+
+app.get('/current', async (req, res) => {
+    const user = req.user
+    const {channel_id} = user
+
+    const channel = await Channel.findOne({
+        id: channel_id
+    })
+
+    if (!channel) return
+
+    if (!channel.activeMap) {
+        return null
+    }
+
+    const item = await Request.findOne({
+        channel: channel_id,
+        _id: channel.activeMap
+    })
+    const requester = await loaders.twitch.users.load(item!.requester)
+    item!.requester = requester.display_name || requester.name
+    res.json(item)
 })
 
 app.post('/request', async (req, res) => {
