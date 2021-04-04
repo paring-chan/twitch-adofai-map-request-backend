@@ -8,6 +8,13 @@ import * as yup from 'yup'
 import cors from 'cors'
 import http from 'http'
 import {Server as SocketIOServer} from "socket.io";
+import axios from "axios";
+
+process.on('uncaughtException', console.error)
+process.on('unhandledRejection', console.error)
+
+axios.defaults.headers['Client-ID'] = config.clientID
+axios.defaults.headers.Accept = 'application/vnd.twitchtv.v5+json'
 
 const secret = Buffer.from(config.secretKey, 'base64')
 
@@ -45,9 +52,14 @@ app.use((req, res, next) => {
 app.get('/requests', async (req, res) => {
     const user = req.user
     const {channel_id} = user
-    res.json(await Request.find({
+    const list = await Request.find({
         channel: channel_id
-    }))
+    })
+    for (const item of list) {
+        const requester = await loaders.twitch.users.load(item.requester)
+        item.requester = requester.display_name || requester.name
+    }
+    res.json(list)
 })
 
 app.post('/request', async (req, res) => {
