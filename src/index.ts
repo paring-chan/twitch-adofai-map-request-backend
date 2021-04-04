@@ -53,7 +53,7 @@ app.use(async (req, res, next) => {
     })
     if (!channel) {
         channel = new Channel()
-        channel.id = req.user.channel_
+        channel.id = req.user.channel_id
         await channel.save()
     }
     next()
