@@ -82,6 +82,7 @@ io.use(async (socket, next) => {
     const user = await verifyAndDecodeToken(auth, secret)
     if (!user) return reject()
     socket.user = user
+    next()
 })
 
 io.on('connection', (socket) => {
