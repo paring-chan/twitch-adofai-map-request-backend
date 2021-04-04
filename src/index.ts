@@ -90,6 +90,7 @@ app.get('/current', async (req, res) => {
         channel: channel_id,
         _id: channel.activeMap
     })
+    if (!item) return res.json(null)
     const requester = await loaders.twitch.users.load(item!.requester)
     item!.requester = requester.display_name || requester.name
     res.json(item)
