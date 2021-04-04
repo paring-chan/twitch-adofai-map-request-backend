@@ -139,6 +139,10 @@ app.delete('/request/:id', moderatorOnly, async (req, res) => {
     })
     if (!request) return res.status(404).json({error: 'request not found'})
     await request.delete()
+
+    io.to(channel_id).emit('reload')
+
+    res.json({ok: true})
 })
 
 app.put('/request/:id', moderatorOnly,  async (req, res) => {
