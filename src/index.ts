@@ -6,10 +6,16 @@ import mongoose from 'mongoose'
 import Request from "./models/Request";
 import * as yup from 'yup'
 import cors from 'cors'
+import http from 'http'
+import {Server as SocketIOServer} from "socket.io";
 
 const secret = Buffer.from(config.secretKey, 'base64')
 
 const app = express()
+
+const server = http.createServer(app)
+
+const io = require('socket.io')(server) as SocketIOServer
 
 app.use(cors())
 
@@ -69,10 +75,16 @@ app.post('/request', async (req, res) => {
     res.json({ok: true})
 })
 
+io.on('connection', (socket) => {
+    console.log(`Connected new socket: ${socket.id}`)
+})
+
 mongoose.connect(config.databaseURL, {
     useUnifiedTopology: true,
     useNewUrlParser: true
-}).then(() => app.listen(config.port, () => console.log(`Listening on port ${config.port}`)))
+}).then(() => {
+    server.listen(config.port, () => console.log(`Listening on port ${config.port}`))
+})
 
 // typings
 declare global {
