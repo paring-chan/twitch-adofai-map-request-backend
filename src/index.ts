@@ -5,10 +5,13 @@ import {verifyAndDecodeToken} from "./utils";
 import mongoose from 'mongoose'
 import Request from "./models/Request";
 import * as yup from 'yup'
+import cors from 'cors'
 
 const secret = Buffer.from(config.secretKey, 'base64')
 
 const app = express()
+
+app.use(cors())
 
 app.use(express.json())
 
@@ -52,6 +55,7 @@ app.post('/request', async (req, res) => {
         return res.status(400).json({error})
     }
 
+    console.log(data)
 
     console.log(channel_id)
     console.log(user_id)
