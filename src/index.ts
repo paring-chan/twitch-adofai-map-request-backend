@@ -9,6 +9,8 @@ const secret = Buffer.from(config.secretKey, 'base64')
 
 const app = express()
 
+app.use(express.json())
+
 app.use((req, res, next) => {
     const reject = () => res.status(401).send('Unauthorized')
     if (!req.headers.authorization) return reject()
