@@ -3,6 +3,7 @@ import express from 'express'
 import config from '../config.json'
 import {verifyAndDecodeToken} from "./utils";
 import mongoose from 'mongoose'
+import Request from "./models/Request";
 
 const secret = Buffer.from(config.secretKey, 'base64')
 
@@ -24,11 +25,12 @@ app.use((req, res, next) => {
     next()
 })
 
-app.get('/requests', (req, res) => {
+app.get('/requests', async (req, res) => {
     const user = req.user
     const {channel_id} = user
-    console.log(channel_id)
-    res.json([])
+    res.json(await Request.find({
+        channel: channel_id
+    }))
 })
 
 mongoose.connect(config.databaseURL, {
