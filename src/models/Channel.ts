@@ -2,7 +2,7 @@ import mongoose, {Document} from "mongoose";
 
 export interface IChannel extends Document {
     id: string
-    activeMap: string
+    activeMap: string|null
 }
 
 const schema = new mongoose.Schema({
@@ -12,6 +12,7 @@ const schema = new mongoose.Schema({
     },
     activeMap: {
         type: String,
+        default: null
     },
 })
 

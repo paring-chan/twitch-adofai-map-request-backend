@@ -152,7 +152,7 @@ app.get('/request/:id/select', moderatorOnly, async (req, res) => {
         id: channel_id
     }))!
 
-    channel.activeMap = req.query.id as string
+    channel.activeMap = req.params.id as string
 
     await channel.save()
 
