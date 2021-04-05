@@ -14,4 +14,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: output
-          path: dist
+          path: |
+            dist
+            config.example.json
+            package.json
+            yarn.lock
