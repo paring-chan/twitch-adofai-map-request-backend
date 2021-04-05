@@ -145,6 +145,22 @@ app.delete('/request/:id', moderatorOnly, async (req, res) => {
     res.end()
 })
 
+app.get('/request/:id/select', moderatorOnly, async (req, res) => {
+    const {channel_id} = req.user
+
+    const channel = (await Channel.findOne({
+        id: channel_id
+    }))!
+
+    channel.activeMap = req.query.id as string
+
+    await channel.save()
+
+    io.to(channel_id).emit('reload')
+
+    res.end()
+})
+
 app.put('/request/:id', moderatorOnly,  async (req, res) => {
     const {channel_id, user_id} = req.user
 
